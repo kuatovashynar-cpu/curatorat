@@ -1,0 +1,281 @@
+<title>Куратор кабинеті</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: бір бағанды тест (720px), куратор аты жоғарыда; әкімшіге "Нәтижелер" кестесі (кең, көлденең скролл) */
+:root{--bg:#f7f8fb;--card:#fff;--tx:#161a24;--mut:#667085;--bd:#dfe3ec;--ac:#3b4fd8;--ok:#1a7f4b;--okb:#e8f6ee;--no:#c0342b;--nob:#fdebea;--ex:#f1f3f8;--hd:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10131a;--card:#1a1f2d;--tx:#e8eaf1;--mut:#9aa3b5;--bd:#2f3649;--ac:#8ea2ff;--ok:#5fd18f;--okb:#15332a;--no:#ff8a80;--nob:#3a1d1d;--ex:#232a3b;--hd:#1a1f2d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10131a;--card:#1a1f2d;--tx:#e8eaf1;--mut:#9aa3b5;--bd:#2f3649;--ac:#8ea2ff;--ok:#5fd18f;--okb:#15332a;--no:#ff8a80;--nob:#3a1d1d;--ex:#232a3b;--hd:#1a1f2d;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--hd);z-index:11}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--hd);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));gap:10px}
+header b{font-size:17px}header span{color:var(--mut);font-size:14px;white-space:nowrap}
+.wrap{max-width:720px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
+.wrap.wide{max-width:1040px}
+.q,.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:20px;margin:16px 0}
+.lb{color:var(--ac);font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.q h3{font-size:18px;line-height:1.35;margin:0 0 14px}
+.o{display:block;width:100%;text-align:left;font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin:8px 0;cursor:pointer}
+.o:hover:not(:disabled){border-color:var(--ac)}
+.o:disabled{cursor:default;opacity:1}
+.o.ok{background:var(--okb);border-color:var(--ok)}.o.no{background:var(--nob);border-color:var(--no)}
+.ex{background:var(--ex);color:var(--mut);border-radius:12px;padding:14px 16px;margin-top:10px;font-size:15px}
+.res{background:var(--card);border:2px solid var(--ac);border-radius:18px;padding:24px;text-align:center;font-size:20px;font-weight:700;margin:16px 0}
+.res small{display:block;color:var(--mut);font-weight:400;font-size:14px;margin-top:6px}
+.btn{padding:12px 22px;border-radius:12px;border:1px solid var(--ac);background:var(--ac);color:#fff;font:inherit;font-weight:600;cursor:pointer;margin-top:14px}
+.btn.sm{margin:0;padding:8px 14px;font-size:14px}
+.btn.ghost{background:transparent;color:var(--ac)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+/* куратор аты */
+.card h2{font-size:18px;margin:0 0 4px}
+.card p{margin:0 0 12px;color:var(--mut);font-size:15px}
+.nm{display:flex;gap:10px;flex-wrap:wrap}
+.nm input,.flt input{flex:1 1 220px;min-width:0;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:12px 14px}
+.nm .btn{margin:0}
+.lv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.lv label{position:relative;display:block;border:1px solid var(--bd);border-radius:12px;padding:12px 14px;cursor:pointer;background:var(--bg)}
+.lv input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.lv label:has(input:checked){border-color:var(--ac);box-shadow:inset 0 0 0 1px var(--ac)}
+.lv label:has(input:focus-visible){outline:2px solid var(--ac);outline-offset:2px}
+.lv b{display:block}.lv small{color:var(--mut);font-size:13px}
+.card form .btn{margin-top:0}
+.who{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.who b{font-size:17px;overflow-wrap:anywhere}
+.who small{display:block;color:var(--mut);font-size:13px}
+.err{color:var(--no);font-size:14px;margin-top:8px}
+.st{font-size:13px;color:var(--mut);margin-top:8px}
+.st.bad{color:var(--no)}
+/* нәтижелер кестесі */
+.tabs{display:flex;gap:6px;margin:4px 0 0}
+.tabs button{padding:8px 16px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit;font-size:14px;cursor:pointer}
+.tabs button.on{border-color:var(--ac);color:var(--ac);font-weight:700}
+.sum{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 12px}
+.sum div{flex:1 1 140px;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px}
+.sum b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.sum span{color:var(--mut);font-size:13px}
+.flt{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.tw{overflow-x:auto;background:var(--card);border:1px solid var(--bd);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--bd);vertical-align:top}
+th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);background:var(--ex);white-space:nowrap}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.row{cursor:pointer}
+tr.row:hover td{background:var(--ex)}
+tr.row:focus-visible{outline-offset:-2px}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--ex);color:var(--mut)}
+.pill.done{background:var(--okb);color:var(--ok)}
+.pct{font-weight:700}
+.det td{background:var(--ex);padding:6px 12px 14px}
+.ans{padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.ans:last-child{border-bottom:0}
+.ans .qt{font-weight:600}
+.ans .c{margin-top:2px}
+.ans.ok .c{color:var(--ok)}.ans.no .c{color:var(--no)}
+.ans .k{color:var(--mut)}
+.empty{padding:28px 16px;text-align:center;color:var(--mut)}
+</style>
+
+<header><b>Куратор кабинеті</b><span id="sc"></span></header>
+<div class="wrap" id="wrap">
+ <div class="tabs" id="tabs" hidden><button id="tabT" class="on" type="button">Тест</button><button id="tabR" type="button">Нәтижелер</button></div>
+
+ <div id="viewT">
+  <div class="card" id="nameCard">
+   <h2>Куратор туралы</h2>
+   <p>Аты-жөніңізді жазып, өз деңгейіңізді таңдаңыз. Таңдаған деңгейдің сұрақтары ғана көрсетіледі.</p>
+   <form id="nameForm" autocomplete="off">
+    <div class="nm"><input id="nameIn" type="text" maxlength="80" placeholder="Мысалы: Асқарова Айгерім" aria-label="Аты-жөні"></div>
+    <div class="lv" role="radiogroup" aria-label="Деңгей">
+     <label><input type="radio" name="lvl" value="j"><b>Джуниор куратор</b><small>20 сұрақ</small></label>
+     <label><input type="radio" name="lvl" value="s"><b>Аға куратор</b><small>20 сұрақ</small></label>
+    </div>
+    <button class="btn" type="submit">Бастау</button>
+   </form>
+   <div class="err" id="nameErr" hidden></div>
+  </div>
+
+  <div class="card who" id="whoCard" hidden>
+   <div><small id="whoLvl">Куратор</small><b id="whoName"></b><div class="st" id="st"></div></div>
+   <button class="btn sm ghost" id="chg" type="button">Өзгерту</button>
+  </div>
+
+  <div id="testArea" hidden>
+   <div id="qs"></div><div id="fin"></div>
+  </div>
+ </div>
+
+ <div id="viewR" hidden>
+  <div class="sum" id="sum"></div>
+  <div class="flt">
+   <input id="flt" type="search" placeholder="Куратор атымен іздеу" aria-label="Іздеу">
+   <button class="btn sm" id="csv" type="button" hidden>CSV жүктеу</button>
+  </div>
+  <div class="st" id="rst"></div>
+  <div class="tw"><table id="tbl"><thead><tr><th>Күні</th><th>Куратор</th><th>Тест</th><th>Жауап</th><th>Дұрыс</th><th>%</th><th>Күйі</th></tr></thead><tbody id="tb"></tbody></table></div>
+ </div>
+</div>
+<script>
+var D={"j":[{"t":"Жаңа ментор топты, жаңа оқушыларды қабылдаған күні ата-аналар мен оқушыларға қашанға дейін байланысып, өзін таныстырып, танысу кеші уақытын белгілеуі тиіс?","o":["Келесі жұмыс күнінің соңына дейін","Сол күні кешке дейін","Алғашқы сабақтан кейін бір апта ішінде","Ата-ана өзі жазғанша күтеді"],"a":1,"e":"Жаңа ментор топты қабылдаған күні кешке дейін барлық ата-ана мен оқушыға байланысып, өзін таныстырып, танысу кеші уақытын белгілеуі міндетті."},{"t":"Ата-ана баласы туралы КБ сұрады, бірақ менторда ақпарат жоқ. КБ берілетін нақты мерзім қандай болуы керек?","o":["3 күнге дейін","Бір апта ішінде","Мерзім белгіленбейді, ақпарат жиналғанда хабарласады","1 күннен аспауы тиіс"],"a":3,"e":"Ақпарат жоқ болса, КБ ойдан шығарылмайды: ақпарат жиналғаннан кейін беріледі деп айтылып, 1 күннен аспайтын нақты мерзім белгіленеді."},{"t":"Кіріс қоңырауға жауап берудің дұрыс сәлемдесу стандарты қайсысы?","o":["«Сәлеметсіз бе, бұл куратор (аты), қалай көмектесе аламын?»","«Алло, тыңдап тұрмын»","«Иә, кім қоңырау шалды?»","«Сәлеметсіз бе, не болды?»"],"a":0,"e":"Кіріс қоңыраудың стандарты: «Сәлеметсіз бе, бұл куратор (аты), қалай көмектесе аламын?»"},{"t":"Куратор ата-анаға қаратып қай сөздерді қолдануы керек?","o":["«Аға», «Тәте»","«Апай», «Ағай»","«Ханым», «Мырза»","Тек есімімен, ешқандай құрметті сөзсіз"],"a":2,"e":"«Аға», «тәте» деген сөздерді қолдануға болмайды, орнына «Ханым», «Мырза» айтылады."},{"t":"Куратор қай сөздерді қолдануға тыйым салынған?","o":["«Ханым», «Мырза»","«Сәлеметсіз бе»","«Күшті мұғалім», «әлсіз мұғалім»","«Мен анықтап, сізге кері байланыс беремін»"],"a":2,"e":"«Күшті мұғалім», «әлсіз мұғалім» деген сөздерді қолдануға тыйым салынған."},{"t":"WhatsApp-та жіберілетін дауыс хабарламасының ұзақтығы қандай болуы тиіс?","o":["1 минуттан аспауы тиіс","2 минутқа дейін","3 минутқа дейін","Шектеу жоқ"],"a":0,"e":"Дауыс хабарламасы нақты мазмұнды және 1 минуттан аспауы тиіс; жібергенше ата-анадан рұқсат сұралады. 2–3 секундтық «ия», «жақсы» хабарламаларға болмайды."},{"t":"Куратор ата-аналар мен мұғалімдерді бір чатқа біріктіріп, ортақ әңгіме құра ала ма?","o":["Иә, егер бұл ыңғайлы болса","Иә, тек шағым болғанда","Иә, тек тимлидтің рұқсатымен","Жоқ, қатаң тыйым салынады"],"a":3,"e":"Ата-аналар мен мұғалімдерді бір чатқа біріктіріп, ортақ әңгіме құруға қатаң тыйым салынған."},{"t":"Ата-ана жұмыс уақыты біткеннен кейін қоңырау шалса немесе жазса, куратор не істейді?","o":["Мүлде жауап бермейді","Жауап бермеуге құқылы, бірақ жұмысқа келе салысымен міндетті түрде қайта қоңырау шалады/жауап береді","Қанша уақыт болса да, бірден жеке нөмірінен жауап береді","Ата-ана қайта жазғанша күтеді"],"a":1,"e":"Жұмыс уақытынан тыс жауап бермеуге құқылы, бірақ жұмыс күні басталысымен міндетті түрде қайта қоңырау шалып/жауап беруі тиіс."},{"t":"Төмендегілердің қайсысы КБ критерийлеріне жатпайды?","o":["Баланы басқа оқушылармен салыстыру","Түсінікті болуы","Тұрақты болуы","Дер кезінде берілуі"],"a":0,"e":"КБ критерийлері: түсінікті, тұрақты, конструктивті, сыйластық, жауапкершілік, сенім, дер кезінде. Балаларды бір-бірімен салыстыруға тыйым салынған."},{"t":"Сэндвич әдісінің дұрыс реті қайсысы?","o":["Сын → оң КБ → оң КБ","Қиындықтар → шешім → мақтау","Оң КБ → қиындықтар/проблемалар → баланың қолынан келетініне сенім (оң КБ)","Оң КБ → оң КБ → сын"],"a":2,"e":"Сэндвич әдісі: алдымен баланың жетістігі, одан кейін қиындықтар, соңында баланың қолынан келетініне сенім."},{"t":"ППРС әдісінің аббревиатурасы қалай ашылады?","o":["План, Прогресс, Результат, Срок","Проблема, Причина, Решение, Сроки","Проблема, Предложение, Реакция, Сумма","Причина, Процесс, Решение, Статистика"],"a":1,"e":"ППРС: Проблема – Причина – Решение – Сроки (мәселе, себеп, шешім, мерзім)."},{"t":"Жұмыс уақытынан тыс автоматты хабарлама орнату туралы қай тұжырым дұрыс?","o":["Міндетті емес, куратор қаласа орнатады","Тек демалыс күндері орнатылады","Ата-ана сұраған жағдайда ғана орнатылады","Автоматты хабарлама міндетті түрде орнатылуы тиіс"],"a":3,"e":"Жұмыс уақытынан тыс автоматты хабарлама орнатылуы міндетті, оның дайын скрипті бар."},{"t":"Куратор ата-анаға мұғалімнің жеке нөмірін бере ала ма?","o":["Иә, ата-ана сұраса","Иә, тек шұғыл жағдайда","Тек ата-ана екінші рет сұраса","Жоқ, қатаң тыйым салынады"],"a":3,"e":"Мұғалімдердің, ата-аналардың, басқа балалардың және орталық басшыларының жеке нөмірлерін ата-анаға беруге қатаң тыйым салынған."},{"t":"Сапа бақылау бөлімінің міндетіне жатпайтыны қайсысы?","o":["Клиентпен байланысқа баға беріп, кері байланыс беру","Оқушыларға пән сабағын өткізу","Тұрақты чаттармен жұмысты тексеру","Кураторларды оқыту және аттестация жасау"],"a":1,"e":"Сапа бақылау бөлімі сабақ өткізбейді: байланысқа баға береді, чаттарды тексереді, кураторларды оқытып, аттестация жасайды."},{"t":"Ата-ананың сұрағына куратор жауап білмесе, қалай әрекет еткені дұрыс?","o":["Үнсіз отырып, ақпаратты еске түсіргенше күту","Болжап, ең ықтимал жауапты айту","Бірден «мен анықтап, сізге кері байланыс беремін» деп айту","Сұрақты елемей, басқа тақырыпқа ауысу"],"a":2,"e":"Жауап білмесе, үнсіз кідірмей, бірден «мен анықтап, сізге кері байланыс беремін» деген тиімді."},{"t":"«Шағым – сыйлық» формуласындағы бірінші қадам қайсысы?","o":["Рақмет айту","Қателік үшін кешірім сұрау","Мәселені дереу түзету","Қажетті ақпаратты анықтау"],"a":0,"e":"«Шағым – сыйлық» формуласы рақмет айтудан басталады, содан кейін пікірдің құндылығы, кешірім, дереу шара уәдесі."},{"t":"Куратор ата-анаға WhatsApp-та қалай жазуы тиіс?","o":["Қысқартуларды қолданып, тез және қысқа","Толық, ойластырылған мәтінмен, грамматика мен пунктуацияны сақтап, жібермес бұрын қателерін тексеріп","Маңызды сөздерді Caps Lock-пен жазып","Тек 2–3 секундтық дауыс хабарламаларымен"],"a":1,"e":"Хабарлама толық, сауатты, қысқартусыз және Caps Lock-сыз жазылып, жібермес бұрын қателерге тексеріледі."},{"t":"Ата-ана куратордың Telegram-ына жазса, куратор не істеуі керек?","o":["Жауап беріп, алдағы уақытта WhatsApp-қа жазуға бағыттауы керек","Telegram-да ғана жалғастыра беруі керек","Жауап бермеуі керек, себебі ресми арна WhatsApp","Ата-анаға қоңырау шалуға тыйым салынады деп айтуы керек"],"a":0,"e":"Telegram-ға жазса да жауап беріледі, ал алдағы уақытта WhatsApp-қа жазуға бағытталады."},{"t":"Баланы бір топтан екіншісіне ауыстыру кімнің рұқсатымен жүзеге асады?","o":["Тек ата-ананың өтінішімен","Куратордың өз шешімімен","Мұғалімнің өз шешімімен","Оқу бөлімі, куратор тимлид басшылардың рұқсатымен"],"a":3,"e":"Баланы ауыстыру тек оқу бөлімі, куратор тимлид басшылардың рұқсатымен жүзеге асады."},{"t":"Ментордың «мазаламаймын ба?» деген тіркесті қолдануы туралы қай тұжырым дұрыс?","o":["Әр қоңырау басында міндетті түрде айтуы керек","Тек кешкі уақытта айтады","Қолданбауы тиіс: хабарласқан бойда бірден мәселеге көшуі керек","Тек WhatsApp-та қолданады"],"a":2,"e":"«Мазаламаймын ба?» деп айтпайды: хабарласып, бірден мәселеге көшеді, сонда ата-ана хабарламаға мән береді."}],"s":[{"t":"Ата-ана қоңырау шалып, сабаққа/мұғалімге шағымданды. Куратордың әрекеттер реті қайсысында дұрыс көрсетілген?","o":["Мұғалімді қорғап, шағымның негізсіз екенін түсіндіру → мерзім белгілемей, мәселе шешілгенде хабарласу","Ата-ананың жағына шығып, мұғалімнің қателігін мойындау → мұғалімнің нөмірін беріп, өзара келісуін ұсыну","Тыңдап, нақтылап, естіп тұрғанын білдіру → жағдай ерекше екенін және онымен жұмыстанатынын айту (ешкімнің жағына шықпай) → КБ мерзімін белгілеу → қарсылықты жазып, формаға тіркеп, орындаушыны белгілеу → орындалуын бақылау → ата-анаға КБ беру","Шағымды жазып алу → шешімді бірден өзі айту → форманы толтырмай, ата-анаға қайта хабарламау"],"a":2,"e":"Реті: тыңдау және естігенін білдіру → мәселе ерекше екенін айту (ешкімнің жағына шықпай) → КБ мерзімін белгілеу → жазып алып, формаға тіркеп, орындаушыны белгілеу → бақылау → ата-анаға КБ."},{"t":"Ата-ана баласы туралы КБ сұрады, бірақ куратор жаңа келген және баланы танымайды. Қай әрекет ережеге сәйкес?","o":["Нәтижелерді, қатысуды қарап, қажет болса мұғалімнен ақпарат жинап, КБ-ны нақты мерзімде (1 күннен аспай) беретінін айту","Жалпы мәліметтерге сүйеніп, баланың сипаттамасын болжап айтып, ата-ананы тыныштандыру","КурКаб-ты асығыс ашып, көрген алғашқы мәліметтерді бірден оқып беру","Бұл бала оның тобында емес екенін айтып, 3 күннен кейін қайта қоңырау шалуын сұрау"],"a":0,"e":"Ойдан шығарып, импровизация жасауға болмайды: алдымен ақпарат жиналады, КБ нақты мерзімде (1 күннен аспай) беріледі."},{"t":"Баланы жаңа кураторға ауыстыру кезінде қай тұжырым дұрыс?","o":["Тек баланың бағалары беріледі, ата-ана туралы ақпарат құпия болып қалады","Ауыстыруды куратор мен ата-ана өзара келісіп шеше алады, ақпарат беру міндетті емес","Жаңа куратор баланы өзі танып алуы тиіс, сондықтан бұрынғы шағымдар туралы айтылмайды","Баланың барлық ақпараты, қажет болса ата-ана туралы мәлімет (жеке келісімдер, жеке сабақтар, бұрынғы шағымдар, конфликттер) жаңа кураторға беріледі, ауыстыруға оқу бөлімі мен тимлидтің рұқсаты қажет"],"a":3,"e":"Ауыстыру кезінде бала туралы барлық ақпарат, қажет болса ата-ана туралы да (келісімдер, бұрынғы шағымдар, конфликттер) беріледі; рұқсат оқу бөлімі мен тимлидтен алынады."},{"t":"КБ бермес бұрын нәтижелерді талдау ережесіне сәйкес КЕЛМЕЙТІН әрекетті көрсетіңіз.","o":["Апталық рейтинг бойынша баланың орташа балы мен қатысуын қарау","Нәтиженің төмендеу себебі анықталмай-ақ ата-анаға КБ беріп, себебін ата-анадан сұрау","Әр пәннен ең төмен және ең жоғары балл жиналған тақырыптарды өзі үшін белгілеп алу","Мәселе байқалса, баламен және мұғаліммен сөйлесіп, себебін анықтау"],"a":1,"e":"Нәтиженің төмендеу себебі анықталмай тұрып ата-анаға КБ берілмейді: алдымен талдау, баламен және мұғаліммен сөйлесу."},{"t":"Ата-ана: «Онлайн форматта баламның көңілі бөлінеді, бақылау жоқ» деді. Қай жауап құжаттағы аргументтерге сәйкес?","o":["Сабақ жазбасы сақталады, сондықтан бала көңіл бөлмесе де кейін қарай алады, бақылаудың қажеті жоқ","Камера міндетті, куратор әр 10–15 минут сайын тексереді, сабақта тақырыптық сұрақ-тесттер өтеді, үй тапсырмасын куратор жеке тексеріп, кері байланыс береді","Камера міндетті емес, бала сабақты тыңдап отырса жеткілікті","Бақылау толығымен ата-анаға жүктеледі, куратор тек кестені жібереді"],"a":1,"e":"Онлайн бақылау: камера міндетті, куратор әр 10–15 минут сайын тексереді, сабақта тесттер өтеді, үй тапсырмасын куратор жеке тексереді."},{"t":"«Нәтиже болатынына кепілдік бар ма?» деген қарсылыққа ең дұрыс жауап қайсысы?","o":["100% жоғары балл аласыздар деп кепілдік беріп, ұнамаса бір айдан кейін ақшаны қайтарамыз деу","Кепілдік беруге болмайды, бұл сұрақты сату бөліміне жолдау","Бала өзі тырысса нәтиже болады, сондықтан орталықтың жауапкершілігі жоқ деп түсіндіру","Бір реттік уәде емес, жүйе беріледі: кіріс тест, ай сайынғы пробный тест пен зачет, апталық прогресс кестесі, әлсіз тақырыптарды ата-анамен бөлісу, кейстер мен статистика"],"a":3,"e":"Нәтижені жалаң уәдемен емес, жүйемен (кіріс тест, ай сайынғы пробный тест пен зачет, прогресс кестесі) көрсетеміз. Ақшаны қайтару уәдесі берілмейді."},{"t":"ППРС әдісінде «Шешім» кезеңінде куратор қалай әрекет етуі керек?","o":["Себепті анықтағаннан кейін ата-анадан жағдайға не әсер еткенін сұрап, бірлесіп шешім (қосымша сабақ, оқу жоспарын түзету, бақылауды күшейту т.б.) таңдап, мерзім белгілеу","Дереу өз шешімін айтып, ата-анадан тек келісім алу","Шешімді тек мұғалімге қалдырып, ата-анаға мерзімсіз хабарласатынын айту","Себебін талдамай-ақ қосымша сабақты ұсынып, мерзімді ата-ананың өзі белгілеуіне қалдыру"],"a":0,"e":"Шешімге асықпай, алдымен ата-ананың пікірін сұрап, бірге шешім таңдайды; шешімге әрдайым мерзім қойылады."},{"t":"Баланың үлгерімі төмен. Сэндвич әдісі бойынша қай КБ дұрыс құрылған?","o":["Төмен нәтижені бірден айтып, соңында «басқа балалар сияқты тырысуы керек» деп салыстыру","Тек жақсы жақтарын айтып, қиындықтарды ата-ана өзі байқасын деп қалдыру","Сабаққа қатысып жүргені мен белсенділігін атап өту → нақты қиындықты (уақытты пайдалану, нақты тақырыптар) айыптамай айту → іс-қимыл жоспарын бірге құрып, баланың қолынан келетініне сенім білдіру","Сынмен бастап, жауапкершілікті ата-анаға жүктеп, оң сөзбен аяқтау"],"a":2,"e":"Мақтаудан бастап, қиындықты жағымсыз реңксіз және нақты айтады, соңында іс-қимыл жоспары мен сенім. Сынмен бастау ата-анада қорғаныс тудырады."},{"t":"Қарсылықтармен жұмыс құрылымының дұрыс реті қайсысы?","o":["Қарсылық → Шешім → Себеп → Түсіну → Жұмыс → Мерзім → Келісу","Түсіну → Қарсылық → Жұмыс → Себеп → Шешім → Мерзім → Келісу","Себеп → Қарсылық → Шешім → Түсіну → Келісу → Жұмыс → Мерзім","Қарсылық → Себеп → Түсіну → Жұмыс → Шешім → Келісу → Мерзімдерді сақтау"],"a":3,"e":"Құрылым: Қарсылық → Себеп → Түсіну → Жұмыс → Шешім → Келісу → Мерзімдерді сақтау."},{"t":"«Шағым – сыйлық» формуласындағы алғашқы төрт қадам қай жауапта дұрыс?","o":["Рақмет айту → пікірдің құнды екенін білдіру → қателік үшін кешірім сұрау → мәселені шешуге дереу шара қолданатынына уәде беру","Кешірім сұрау → рақмет айту → ақпаратты анықтау → қателікті түзету","Ақпаратты анықтау → қателікті түзету → рақмет айту → кешірім сұрау","Рақмет айту → қателікті түзету → пікірдің құнды екенін білдіру → кешірім сұрау"],"a":0,"e":"Алғашқы қадамдар: рақмет, пікір құнды екенін білдіру, кешірім сұрау, дереу шара қолданатынына уәде беру. Содан кейін ақпаратты анықтау, түзету, қанағаттанғанына көз жеткізу, алдын алу."},{"t":"Ата-ана: «Сату бөлімі ноутбук пен кітаптар сыйға беріледі деп уәде берген» деді, куратор бұл туралы білмейді. Қай жауап дұрыс?","o":["«Бұл сату бөлімінің сұрағы, маған қатысы жоқ, соларға жазыңыз»","«Білмеймін, бірақ ондай уәдені сату бөлімі жиі беріп жібереді»","«Түсіндім, қазір нақтылап алып, сол күннің соңына дейін мамандармен байланысып сізге жауап беремін»","«Иә, ноутбук беріледі», деп растап, кейін тексеру"],"a":2,"e":"«Мен білмеймін», «бізге қатысы жоқ» деп жауап беруге болмайды: нақтылап алып, сол күннің соңына дейін мамандармен байланысып кері байланыс беру керек."},{"t":"«Баламның оқығысы келмейді, мотивациясы жоқ» деген ата-анаға құжат бойынша ең дұрыс стратегия қайсысы?","o":["Бұл баланың жеке мәселесі екенін, ата-ана үйде өзі түсіндіруі керегін айту","Мотивацияны оқу форматы жасайтынын түсіндіру: тақырыптық тесттер, ай сайынғы зачет, 1–2 аптада көрінетін нәтиже, жеке бақылау және мұғалімге ескерту арқылы баланы сабақта белсенді ету","Мотивация болмаса, сабаққа қатысу міндетті емес деп, тек жазбаны көруді ұсыну","Басқа оқушылардың жетістіктерімен салыстырып, баланы бәсекелестікке итермелеу"],"a":1,"e":"Мотивацияны оқу форматы жасайды: тақырыптық тесттер, ай сайынғы зачет, 1–2 аптада көрінетін нәтиже және жеке бақылау."},{"t":"Ата-ана: «Курсқа төлейтін ақшам жоқ» деді. Қай әрекет құжаттағы тәсілге сәйкес?","o":["Түсіністік білдіріп, құндылықты көрсету және нарықпен салыстыру (орташа дайындық 40–60 мың), нақты мақсатты (грант) анықтап, қысым жасамай бөліп төлеу/рассрочка опциясын ұсыну","Бағаны төмендетуге болатынын айтып, жеке жеңілдік уәде ету","Төлем мүмкіндігі жоқ болса, курстан бас тартуды ұсыну","«Тек бүгін шешім қабылдасаңыз ғана орын сақталады» деп, шешімге асықтыру"],"a":0,"e":"Қысымсыз, баға мен сапаны нарықпен салыстырып, ата-ананың мақсатын анықтап, бөліп төлеу (рассрочка) опциясын ұсынады."},{"t":"Ата-ана: «Баламның мұғалімнің әдістемесі келмейді» деді. Қай әрекет дұрыс?","o":["Мұғалімді бірден ауыстыруды ұсыну, себебі білім сапасы бірінші орында","Мұғалімнің әдістемесі ҰБТ-ға сай болғандықтан, мәселе тек бала жағында екенін дәлелдеу","Алғашқы сабақтарда адаптация қалыпты екенін түсіндіріп, баланың оқу стилін анықтап, мұғалімнен қарқынды түзетуін сұрау, қосымша бақылау жүргізу; мұғалімді ауыстыру — барлығы жасалып, нәтиже болмаған соңғы шара","Мұғалімнің сабақ беруі әлсіз екенін мойындап, сапа бөліміне шағымдануды ұсыну"],"a":2,"e":"Алғашқы сабақтарда адаптация қалыпты. Оқу стилі анықталып, мұғалімге ескерту беріледі; мұғалімді ауыстыру барлығы жасалғаннан кейінгі соңғы шара."},{"t":"Ата-ана: «Асығыс шешім қабылдап қойдым, енді күмәнданып тұрмын» деді. Қай әрекет дұрыс?","o":["Шешім қабылданған, шарттарды өзгертуге болмайды деп түсіндіру","Түсіністік танытып, нақты қандай мәселе барын анықтап, топты/мұғалімді/кестені қайта реттеу мүмкіндігін айтып, сабаққа қатысып көруді ұсыну; «ұнамаса ақшаңызды қайтарамыз» деп уәде бермеу","«Бір ай қатысып көріңіз, ұнамаса ақшаңызды түгел қайтарамыз» деп уәде беру","Басқа орталықтардың кемшіліктерін айтып, оларға бармауға көндіру"],"a":1,"e":"Күмәнді түсінумен қабылдап, мәселені анықтап, сабаққа кіріп көруді ұсынады. «Ұнамаса ақшаны қайтарамыз» деп уәде берілмейді."},{"t":"Қоңырау кезінде куратор ата-ананың сұрағын әріптесінен нақтылауы керек. Қай әрекет ережеге сәйкес?","o":["Үнсіз отырып, ақпаратты еске түсіруге тырысады, ата-ана күтуі тиіс","Микрофонды өшірмей-ақ, ата-ананың сұрағын әріптесіне дауыстап қайталайды","Нақтылауға қанша уақыт кетсе де, ата-ананы желіде күттіреді","Нақтылау 10–15 секундтан аспаса, микрофонды өшіріп сұрайды (сұрақты трубкаға айқайламайды); ұзаққа созылса, «мен анықтап, сізге кері байланыс беремін» дейді"],"a":3,"e":"Нақтылау 10–15 секундтан аспаса, микрофон өшіріледі (сұрақты трубкаға айқайламайды). Ұзақ болса, «анықтап, кері байланыс беремін» деп айтады."},{"t":"Белсенді тыңдау құралдарына ЖАТПАЙТЫН әрекет қайсысы?","o":["Растау және қайталау","Перефразирование (сөзін өз сөзіңмен қайталап жеткізу)","Ата-ананың сөзін бөліп, бірден бағалап, өз шешімін айту","Эмпатия таныту"],"a":2,"e":"Белсенді тыңдау: толық назар, растау және қайталау, перефразирование, бағалауды кейінге қалдыру, эмпатия. Сөзін бөліп, бірден бағалау оған қайшы."},{"t":"Ата-ана баласының мұғалімінің жеке нөмірін сұрады, сонымен бірге өз нөмірін орталық басшысына беруге келісті. Куратордың дұрыс әрекеті қайсысы?","o":["Мұғалімнің нөмірін береді, ал ата-ананың нөмірін басшыға рұқсатсыз береді","Мұғалімнің нөмірін тек шұғыл жағдайда береді, ал басшыға ата-ананың нөмірін мүлде бермейді","Нөмірлерді тек ата-ана екінші рет сұраса береді","Мұғалімнің нөмірін бермейді, мәселені өзі жүргізіп КБ береді; ата-ананың рұқсатымен оның нөмірін орталық басшысына бере алады"],"a":3,"e":"Мұғалімнің жеке нөмірін беруге болмайды. Ата-ананың нөмірін оның рұқсатымен ғана орталық басшысына беруге болады."},{"t":"Қай дауыс хабарламасы ережеге сәйкес?","o":["Ата-анадан рұқсат сұрағаннан кейін жіберілген, мазмұны нақты, ұзақтығы 40 секундтық хабарлама","3 секундтық «Сәлеметсіз бе» хабарламасы","Рұқсат сұрамай жіберілген, 2 минуттық егжей-тегжейлі хабарлама","Ата-ана мен мұғалім бір чатта болғанда жіберілген 1 минуттық хабарлама"],"a":0,"e":"Дауыс хабарламасы алдын ала рұқсат сұралғаннан кейін, нақты мазмұнмен және 1 минуттан аспай жіберіледі. Бір чатқа біріктіру тыйым салынған."},{"t":"Төмендегі жағдайлардың қайсысында куратор ережені БҰЗБАҒАН?","o":["Куратор жұмыс уақытында жұмыс телефонын дыбыссыз режимге қойып, үстелде қалдырды","Ата-ана кешке, жұмыс уақыты біткен соң жазды; куратор келесі жұмыс күні басталысымен жауап берді","Куратор ата-ана мен мұғалімді бір чатқа қосып, мәселені бірге талқылатты","Куратор КБ беру кезінде баланың үлгерімін сыныптасымен салыстырып түсіндірді"],"a":1,"e":"Жұмыс уақытынан тыс жазған ата-анаға келесі жұмыс күні басталысымен жауап беру — ереже бұзылмайды. Қалғандары: телефонды дыбыссыз қалдыру, ортақ чат, салыстыру — тыйым."}]};
+/* GitHub Pages үшін: Google Apps Script веб-қосымшасының URL-ін осында қойыңыз (apps-script.gs нұсқаулығын қараңыз) */
+var ENDPOINT="";
+var MODES={j:"Джуниор",s:"Аға куратор"};
+var mode="j",items=[],answered=0,right=0,picks=[],name="",started=false,runId="",startedAt=0;
+var db=null,uid=null,canAdmin=false,dl=null,chain=Promise.resolve(),docMade=false,rows=[],open={};
+function $(id){return document.getElementById(id)}
+var qs=$("qs"),fin=$("fin"),sc=$("sc");
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function upd(){sc.textContent=answered+" / "+items.length+" жауап · "+right+" дұрыс"}
+function setSt(t,bad){var s=$("st");s.textContent=t;s.className="st"+(bad?" bad":"")}
+
+function runData(){
+ return{id:runId,name:name,mode:mode,total:items.length,right:right,done:answered===items.length,startedAt:startedAt,updatedAt:Date.now(),
+  answers:picks.filter(function(p){return p}).map(function(p){return{g:p.g,i:p.i,c:p.c}})};
+}
+function sendSheet(run,last){
+ var q=last&&D[last.g][last.i];
+ var body={run:{id:run.id,name:run.name,level:MODES[run.mode],total:run.total,right:run.right,done:run.done,startedAt:run.startedAt,updatedAt:run.updatedAt},
+  questions:run.answers.length===1?D[last.g].map(function(x,k){return (k+1)+". "+x.t}):null,
+  answer:q?{i:last.i,chosen:q.o[last.c],ok:last.c===q.a}:null};
+ fetch(ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)})
+  .then(function(){setSt("Жауаптарыңыз кестеге жіберілді")}).catch(function(){setSt("Жауап жіберілмеді. Интернетті тексеріңіз.",true)});
+}
+function save(last){
+ if(!db||!uid){if(ENDPOINT)chain=chain.then(function(){sendSheet(runData(),last)});return}
+ var run=runData(),ref=db.doc("attempts/"+uid);
+ chain=chain.then(function(){
+  var patch={name:run.name,updatedAt:run.updatedAt,runs:{}};patch.runs[run.id]=run;
+  if(docMade)return ref.update(patch);
+  return ref.update(patch).catch(function(){return ref.set(patch)}).then(function(){docMade=true});
+ }).then(function(){setSt("Жауаптарыңыз сақталды")}).catch(function(){setSt("Жауап сақталмады. Бетті қайта ашып көріңіз.",true)});
+}
+
+function build(){
+ var g=mode==="s"?"s":"j";
+ items=D[g].map(function(q,i){return{q:q,g:g,i:i}});
+ qs.innerHTML="";fin.innerHTML="";answered=0;right=0;picks=[];runId=newId();startedAt=Date.now();
+ items.forEach(function(it,n){
+  var q=it.q,card=el("div","q");card.appendChild(el("div","lb","Сұрақ "+(n+1)+" / "+items.length));card.appendChild(el("h3",null,q.t));
+  var btns=[];
+  q.o.forEach(function(o,k){var b=el("button","o",o);b.type="button";btns.push(b);
+   b.onclick=function(){
+    btns.forEach(function(x){x.disabled=true});
+    btns[q.a].classList.add("ok");
+    if(k===q.a)right++;else b.classList.add("no");
+    card.appendChild(el("div","ex","Түсіндірме: "+q.e));
+    picks[n]={g:it.g,i:it.i,c:k};
+    answered++;upd();save(picks[n]);
+    if(answered===items.length)finish();
+   };card.appendChild(b)});
+  qs.appendChild(card)});
+ upd();
+}
+function finish(){
+ var p=Math.round(right/items.length*100);
+ var r=el("div","res","Нәтиже: "+right+" / "+items.length+" ("+p+"%)");
+ r.appendChild(el("small",null,"Тест аяқталды"));
+ var b=el("button","btn","Қайта бастау");b.type="button";b.onclick=function(){build();window.scrollTo(0,0)};r.appendChild(b);
+ fin.appendChild(r);r.scrollIntoView({behavior:"smooth",block:"center"});
+}
+/* куратор аты */
+var storeOk=function(){return !!(db&&uid)||!!ENDPOINT};
+function showStarted(on){
+ started=on;
+ $("nameCard").hidden=on;$("whoCard").hidden=!on;$("testArea").hidden=!on;
+ if(on){$("whoName").textContent=name;$("whoLvl").textContent="Куратор · "+MODES[mode];sc.hidden=false;setSt(storeOk()?"Жауаптар автоматты түрде сақталады":"Жауаптар сақталмайды: база қолжетімсіз",!storeOk())}
+ else{sc.textContent="";$("nameIn").value=name;$("nameIn").focus()}
+}
+$("nameForm").addEventListener("submit",function(e){
+ e.preventDefault();
+ var v=$("nameIn").value.replace(/\s+/g," ").trim(),lv=document.querySelector('input[name="lvl"]:checked');
+ var er=$("nameErr");
+ if(v.length<3||v.indexOf(" ")<0){er.textContent="Аты мен жөніңізді толық жазыңыз.";er.hidden=false;return}
+ if(!lv){er.textContent="Деңгейіңізді таңдаңыз: Джуниор немесе Аға куратор.";er.hidden=false;return}
+ er.hidden=true;name=v;mode=lv.value;lsSet("kurator-name",v);lsSet("kurator-level",mode);
+ showStarted(true);build();window.scrollTo(0,0);
+});
+$("chg").onclick=function(){showStarted(false);qs.innerHTML="";fin.innerHTML=""};
+(function(){var n=lsGet("kurator-name");if(n)$("nameIn").value=n;
+ var l=lsGet("kurator-level"),r=l&&document.querySelector('input[name="lvl"][value="'+l+'"]');if(r)r.checked=true})();
+
+/* нәтижелер (тек әкімші) */
+function fmtDate(ms){try{return new Date(ms).toLocaleString("ru-RU",{dateStyle:"short",timeStyle:"short"})}catch(e){return ""}}
+function pct(r){return r.total?Math.round(r.right/r.total*100):0}
+function renderRows(){
+ var f=$("flt").value.trim().toLowerCase(),tb=$("tb");tb.innerHTML="";
+ var list=rows.filter(function(r){return !f||String(r.name).toLowerCase().indexOf(f)>=0});
+ var names={},sumP=0,fin=0;
+ rows.forEach(function(r){names[r.name]=1;if(r.done){sumP+=pct(r);fin++}});
+ var s=$("sum");s.innerHTML="";
+ [[Object.keys(names).length,"куратор"],[rows.length,"әрекет"],[fin?Math.round(sumP/fin)+"%":"–","орташа нәтиже (аяқталғандар)"]].forEach(function(x){var d=el("div");d.appendChild(el("b",null,x[0]));d.appendChild(el("span",null,x[1]));s.appendChild(d)});
+ if(!list.length){var tr=el("tr"),td=el("td","empty",rows.length?"Ештеңе табылмады.":"Әзірге ешкім тест тапсырмады. Куратор бірінші жауап бергенде жол осында пайда болады.");td.colSpan=7;tr.appendChild(td);tb.appendChild(tr);return}
+ list.forEach(function(r){
+  var tr=el("tr","row");tr.tabIndex=0;
+  tr.appendChild(el("td","n",fmtDate(r.updatedAt)));
+  tr.appendChild(el("td",null,r.name));
+  tr.appendChild(el("td",null,MODES[r.mode]||""));
+  tr.appendChild(el("td","n",r.answers.length+" / "+r.total));
+  tr.appendChild(el("td","n",String(r.right)));
+  tr.appendChild(el("td","n pct",pct(r)+"%"));
+  var c=el("td");c.appendChild(el("span","pill"+(r.done?" done":""),r.done?"Аяқталды":"Жалғасуда"));tr.appendChild(c);
+  tb.appendChild(tr);
+  var det=null;
+  function toggle(){
+   if(det){det.remove();det=null;delete open[r.id];return}
+   open[r.id]=1;det=el("tr","det");var td=el("td");td.colSpan=7;
+   r.answers.forEach(function(a,n){
+    var q=D[a.g]&&D[a.g][a.i];if(!q)return;
+    var ok=a.c===q.a,box=el("div","ans "+(ok?"ok":"no"));
+    box.appendChild(el("div","qt",(n+1)+". "+q.t));
+    box.appendChild(el("div","c",(ok?"✓ ":"✗ ")+q.o[a.c]));
+    if(!ok){var k=el("div","k","Дұрыс жауап: "+q.o[q.a]);box.appendChild(k)}
+    td.appendChild(box)});
+   det.appendChild(td);tr.after(det);
+  }
+  tr.onclick=toggle;tr.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle()}};
+  if(open[r.id])toggle();
+ });
+}
+function csvCell(v){return '"'+String(v).replace(/"/g,'""')+'"'}
+$("csv").onclick=function(){
+ var out=[["Күні","Куратор","Тест","№","Сұрақ","Таңдаған жауап","Дұрыс жауап","Нәтиже"].map(csvCell).join(",")];
+ rows.forEach(function(r){r.answers.forEach(function(a,n){
+  var q=D[a.g]&&D[a.g][a.i];if(!q)return;
+  out.push([fmtDate(r.updatedAt),r.name,MODES[r.mode]||"",n+1,q.t,q.o[a.c],q.o[q.a],a.c===q.a?"дұрыс":"қате"].map(csvCell).join(","))})});
+ dl.save({filename:"kurator-natizheler.csv",data:"﻿"+out.join("\r\n")}).catch(function(){});
+};
+$("flt").addEventListener("input",renderRows);
+function setView(v){
+ $("viewT").hidden=v!=="t";$("viewR").hidden=v!=="r";
+ $("tabT").classList.toggle("on",v==="t");$("tabR").classList.toggle("on",v==="r");
+ $("wrap").classList.toggle("wide",v==="r");
+}
+$("tabT").onclick=function(){setView("t")};$("tabR").onclick=function(){setView("r")};
+function listen(){
+ var t=setTimeout(function(){$("rst").textContent="Деректер әлі жүктелген жоқ. Көрсетілгені ескірген болуы мүмкін."},10000);
+ db.collection("attempts").limit(1000).onSnapshot(function(snap){
+  if(!snap.metadata.fromCache){clearTimeout(t);$("rst").textContent=""}
+  var all=[];
+  snap.docs.forEach(function(d){var v=d.data()||{},runs=v.runs||{};
+   Object.keys(runs).forEach(function(k){var r=runs[k];if(r&&Array.isArray(r.answers))all.push(r)})});
+  all.sort(function(a,b){return b.updatedAt-a.updatedAt});
+  rows=all;renderRows();
+ },function(){clearTimeout(t);$("rst").textContent="Нәтижелерді оқу мүмкін болмады."});
+}
+
+/* іске қосу */
+(async function(){
+ try{
+  if(!window.claude||!claude.use)return;
+  var u=await claude.use("user");
+  if(u){uid=await u.id();canAdmin=u.canEdit()}
+  if(uid)db=await claude.use("db");
+  dl=await claude.use("downloads");
+ }catch(e){db=null}
+ if(started)setSt(storeOk()?"Жауаптар автоматты түрде сақталады":"Жауаптар сақталмайды: база қолжетімсіз",!storeOk());
+ if(db&&canAdmin){$("tabs").hidden=false;if(dl)$("csv").hidden=false;listen();renderRows()}
+})();
+</script>
